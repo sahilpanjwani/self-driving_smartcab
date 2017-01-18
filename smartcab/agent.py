@@ -47,7 +47,7 @@ class LearningAgent(Agent):
             self.epsilon = 0
             self.alpha = 0
         else:
-            self.epsilon = self.original_epsilon - 0.005*self.count_trials
+            self.epsilon = self.original_epsilon - 0.003*self.count_trials
 
         return None
 
@@ -133,8 +133,14 @@ class LearningAgent(Agent):
                 new_rand_num = random.randint(0,3)
                 action = self.valid_actions[new_rand_num]
             else:
-                actions_Q_dict = self.Q[state]
-                action = max(actions_Q_dict.iterkeys(), key=(lambda key: actions_Q_dict[key]))
+                max_Q_val = self.get_maxQ(state)
+                actions_maxQ = []
+                for key in self.Q[state].keys():
+                    if self.Q[state][key] == max_Q_val:
+                        actions_maxQ.append(key)
+
+                new_rand_num = random.randint(0,len(actions_maxQ)-1)
+                action = actions_maxQ[new_rand_num]
 
         return action
 
@@ -188,7 +194,7 @@ def run():
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
     #agent = env.create_agent(LearningAgent)
-    kwargs = {'learning':True}
+    kwargs = {'learning':True, 'alpha':0.6}
     agent = env.create_agent(LearningAgent, **kwargs)
     
     ##############
@@ -217,7 +223,7 @@ def run():
     #   n_test     - discrete number of testing trials to perform, default is 0
 
     #sim.run()
-    sim.run(n_test=10,tolerance=0.005)
+    sim.run(n_test=10,tolerance=0.003)
 
 
 if __name__ == '__main__':
